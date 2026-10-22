@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Pembayaran SPP - Pondok Pesantren Salamatul Insan",
+  "description": "Aplikasi pendataan dan pembayaran SPP bulanan Pondok Pesantren Salamatul Insan dengan dashboard interaktif, manajemen tagihan, riwayat pembayaran, kwitansi cetak, dan laporan keuangan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

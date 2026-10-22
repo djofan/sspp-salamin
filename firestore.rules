@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && 
+        request.auth.token.email == 'raida.zaujaty@gmail.com';
+    }
+
+    function isDbAdmin() {
+      return isSignedIn() && (
+        isBootstrappedAdmin() || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isStaff() {
+      return isSignedIn() && (
+        isDbAdmin() || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'bendahara')
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      // Allow user to write their own record on first login, or admin to manage any user
+      allow create: if isSignedIn() && (
+        (request.auth.uid == userId && (
+          (request.auth.token.email == 'raida.zaujaty@gmail.com' && request.resource.data.role == 'admin') ||
+          request.resource.data.role in ['admin', 'bendahara']
+        )) || 
+        isDbAdmin()
+      );
+      allow update: if isSignedIn() && (
+        isDbAdmin() || 
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
+      );
+      allow delete: if isDbAdmin();
+    }
+
+    // School Settings Collection
+    match /school_settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isDbAdmin();
+    }
+
+    // Classes Collection
+    match /classes/{classId} {
+      allow read: if isSignedIn();
+      allow write: if isDbAdmin();
+    }
+
+    // Students Collection
+    match /students/{studentId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isDbAdmin();
+    }
+
+    // Bills Collection (both admin & bendahara can create and update payments on bills)
+    match /bills/{billId} {
+      allow read: if isSignedIn();
+      allow create, update: if isStaff();
+      allow delete: if isDbAdmin();
+    }
+
+    // Payments Collection (Journal transactions)
+    match /payments/{paymentId} {
+      allow read: if isSignedIn();
+      allow create: if isStaff();
+      allow update: if isStaff();
+      // Prohibit silent deletion of payment records
+      allow delete: if false;
+    }
+  }
+}

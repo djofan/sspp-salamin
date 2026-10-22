@@ -1,0 +1,150 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access control for administrative staff and treasurers",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "bendahara"] },
+        "photoURL": { "type": "string", "maxLength": 512 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Santri or student master record enrolled in Pondok Pesantren Salamatul Insan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "nis": { "type": "string", "maxLength": 32 },
+        "name": { "type": "string", "maxLength": 128 },
+        "gender": { "type": "string", "enum": ["L", "P"] },
+        "classLevel": { "type": "string", "maxLength": 32 },
+        "program": { "type": "string", "enum": ["MTs", "MA", "Tahfizh"] },
+        "parentName": { "type": "string", "maxLength": 128 },
+        "parentPhone": { "type": "string", "maxLength": 32 },
+        "joinDate": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "enum": ["Aktif", "Nonaktif"] },
+        "sppAmount": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["nis", "name", "gender", "classLevel", "program", "parentName", "parentPhone", "joinDate", "status", "sppAmount"]
+    },
+    "Class": {
+      "title": "Class",
+      "description": "Rombongan belajar or class grade record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 64 },
+        "program": { "type": "string", "enum": ["MTs", "MA", "Tahfizh"] },
+        "defaultSppAmount": { "type": "number" },
+        "academicYear": { "type": "string", "maxLength": 32 }
+      },
+      "required": ["id", "name", "program", "defaultSppAmount"]
+    },
+    "Bill": {
+      "title": "Bill",
+      "description": "Monthly SPP billing statement for a student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentNis": { "type": "string", "maxLength": 32 },
+        "studentName": { "type": "string", "maxLength": 128 },
+        "classLevel": { "type": "string", "maxLength": 32 },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "amount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "remainingAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Belum Bayar", "Dibayar Sebagian", "Lunas", "Terlambat"] },
+        "dueDate": { "type": "string", "maxLength": 32 },
+        "paidAt": { "type": "string", "maxLength": 64 },
+        "installments": { "type": "array" }
+      },
+      "required": ["studentId", "studentNis", "studentName", "classLevel", "month", "year", "amount", "paidAmount", "remainingAmount", "status", "dueDate"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Cash journal record and receipt for SPP payments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "receiptNumber": { "type": "string", "maxLength": 64 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentNis": { "type": "string", "maxLength": 32 },
+        "studentName": { "type": "string", "maxLength": 128 },
+        "classLevel": { "type": "string", "maxLength": 32 },
+        "monthsCovered": { "type": "array" },
+        "billIds": { "type": "array" },
+        "billPaymentDetails": { "type": "array" },
+        "totalAmount": { "type": "number" },
+        "paymentMethod": { "type": "string", "maxLength": 64 },
+        "paymentType": { "type": "string", "maxLength": 64 },
+        "paidDate": { "type": "string", "maxLength": 64 },
+        "payerName": { "type": "string", "maxLength": 128 },
+        "cashierName": { "type": "string", "maxLength": 128 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["Berhasil", "Dibatalkan"] },
+        "cancelledAt": { "type": "string", "maxLength": 64 },
+        "cancelReason": { "type": "string", "maxLength": 500 },
+        "cancelledBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["receiptNumber", "studentId", "studentNis", "studentName", "classLevel", "monthsCovered", "billIds", "totalAmount", "paymentMethod", "paidDate", "payerName", "status"]
+    },
+    "SchoolSettings": {
+      "title": "SchoolSettings",
+      "description": "General profile and operational configuration of Pesantren Salamatul Insan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "institutionName": { "type": "string", "maxLength": 256 },
+        "subTitle": { "type": "string", "maxLength": 256 },
+        "academicYear": { "type": "string", "maxLength": 32 },
+        "address": { "type": "string", "maxLength": 512 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "email": { "type": "string", "maxLength": 128 },
+        "website": { "type": "string", "maxLength": 128 },
+        "logoUrl": { "type": "string", "maxLength": 512 },
+        "treasurer": { "type": "string", "maxLength": 128 },
+        "principal": { "type": "string", "maxLength": 128 },
+        "defaultSppAmount": { "type": "number" },
+        "dueDay": { "type": "number" },
+        "bankAccounts": { "type": "array" }
+      },
+      "required": ["institutionName", "academicYear", "address", "phone", "treasurer", "principal", "defaultSppAmount"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Collection of user accounts with roles (admin or bendahara)"
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Collection of student / santri profiles"
+    },
+    "/classes/{classId}": {
+      "schema": { "$ref": "#/entities/Class" },
+      "description": "Master list of classes and default SPP rates"
+    },
+    "/bills/{billId}": {
+      "schema": { "$ref": "#/entities/Bill" },
+      "description": "Monthly student billing statements"
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/Payment" },
+      "description": "Cash receipts and payment transactions"
+    },
+    "/school_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/SchoolSettings" },
+      "description": "School / Pesantren global profile and configuration"
+    }
+  }
+}
